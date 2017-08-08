@@ -1,6 +1,7 @@
 # Idicon
 
-**    Idicon can be used to produce 5x5 user identifiable unique icons, also known as identicons.
+    **  
+    Idicon can be used to produce 5x5 user identifiable unique icons, also known as identicons.
     These are similar to the default icons used with github.
     Idicon supports 5x5 identicons in svg, png, or raw_bitmap, with custom padding.
 
@@ -19,5 +20,5 @@ def deps do
 end
 ```
 
-The documentation can be found at [https://hexdocs.pm/idicon](https://hexdocs.pm/identicon).
+The documentation can be found at [https://hexdocs.pm/idicon](https://hexdocs.pm/idicon).
 
