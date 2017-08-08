@@ -1,12 +1,15 @@
-defmodule Identicon.Mixfile do
+defmodule Idicon.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :identicon,
-     version: "0.1.0",
-     elixir: "~> 1.4",
+    [app: :idicon,
+     version: "0.1.1",
+     elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description(),
+     package: package(),
+     source_url: "https://github.com/Softhatch/elixir-identicon/",
      deps: deps()]
   end
 
@@ -15,25 +18,31 @@ defmodule Identicon.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger]]
+    [extra_applications: [:logger, :crypto]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:my_dep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:my_dep, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+    {:ex_doc, "~> 0.14", only: :dev, runtime: false}
+    ]
   end
 
   defp package do
-    %{licenses: ["Apache 2"],
+    [
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
+      licenses: ["MIT"],
       contributors: ["Softhatch"],
-      links: %{"Github" => "https://github.com/softhatch/identicon"}}
+      maintainers: ["Softhatch"],
+      links: %{"Github" => "https://github.com/softhatch/elixir-identicon"}
+    ]
   end
+
+  defp description do
+    """
+    Idicon can be used to produce 5x5 user identifiable unique icons, also known as identicons.
+    These are similar to the default icons used with github.
+    Idicon supports 5x5 identicons in svg, png, or raw_bitmap, with custom padding.
+    """
+  end
+
 end
