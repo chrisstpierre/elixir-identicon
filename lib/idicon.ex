@@ -26,9 +26,8 @@ defmodule Idicon do
   
   """
 
-  @defaults %{type: :svg, color: :unique, padding: 0, size: 250 }
+  @defaults %{type: :svg, color: :unique, padding: 0, size: 250, squares: 5 }
   @preset_colors %{red: {255,0,0}, green: {0,255,0}, blue: {0,0,255}}
-  @num_squares 5
 
   @doc """
   Create an identicon. The identicon can be sent to the client or saved.
@@ -49,14 +48,14 @@ defmodule Idicon do
   """
 
   def create(input, opts \\ []) do
-    %{type: type, color: color, padding: padding, size: size} = Enum.into(opts, @defaults)
+    %{type: type, color: color, padding: padding, size: size, squares: squares} = Enum.into(opts, @defaults)
     size = round(size)
       input
         |> hash_input
         |> determine_color(color)
-        |> set_grid
+        |> set_grid(squares)
         |> filter_odd_squares
-        |> build_pixel_map(size)
+        |> build_pixel_map(size, squares)
         |> draw_image(type, padding, size)
   end
   
@@ -98,8 +97,8 @@ defmodule Idicon do
     create_and_save(input, path, "#{input}.#{Enum.into(opts, @defaults).type}", opts)
   end
 
-  defp hash_input(input) do
-    hex = :crypto.hash(:md5, input)
+  def hash_input(input) do
+    hex = :crypto.hash(:sha512, input)
       |> :binary.bin_to_list
     %Idicon.Image{hex: hex}
   end
@@ -117,20 +116,23 @@ defmodule Idicon do
     %Idicon.Image{image | color: Map.fetch!(@preset_colors, color)}
   end
 
-  defp set_grid(%Idicon.Image{hex: hex} = image) do
+  defp set_grid(%Idicon.Image{hex: hex} = image, squares) do
     grid = 
       hex
-        |> Enum.chunk(3)
-        |> Enum.map(&mirror_row/1)
+        |> Enum.chunk(round(squares/2))
+        |> Enum.map(&mirror_row(&1,squares))
         |> List.flatten
         |> Enum.with_index
     
     %Idicon.Image{image | grid: grid}
   end
 
-  defp mirror_row(row) do
-    [first, second | _tail] = row
-    row ++ [second, first]
+  defp mirror_row(row, squares) do
+    mirror_amount = round Float.floor(squares/2)
+    additional = Enum.slice(row, 0..mirror_amount-1)
+    # [first, second, third | _tail] = row
+    # row ++ [third, second, first]
+    row ++ Enum.reverse(additional)
   end
 
   defp filter_odd_squares(%Idicon.Image{grid: grid} = image) do
@@ -141,11 +143,11 @@ defmodule Idicon do
     %Idicon.Image{image | grid: grid}
   end
 
-  defp build_pixel_map(%Idicon.Image{grid: grid} = image, size) do
+  defp build_pixel_map(%Idicon.Image{grid: grid} = image, size, squares) do
     pixel_map = Enum.map grid, fn({_code, index}) ->
-        square_size = round(size / @num_squares)
-        horizontal = rem(index, @num_squares) * square_size
-        vertical = div(index, @num_squares) * square_size
+        square_size = round(size / squares)
+        horizontal = rem(index, squares) * square_size
+        vertical = div(index, squares) * square_size
         top_left = {horizontal, vertical}
         bottom_right = {horizontal + square_size, vertical + square_size}
 
