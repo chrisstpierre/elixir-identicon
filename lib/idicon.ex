@@ -97,7 +97,7 @@ defmodule Idicon do
     create_and_save(input, path, "#{input}.#{Enum.into(opts, @defaults).type}", opts)
   end
 
-  def hash_input(input) do
+  defp hash_input(input) do
     hex = :crypto.hash(:sha512, input)
       |> :binary.bin_to_list
     %Idicon.Image{hex: hex}
