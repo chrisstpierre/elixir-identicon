@@ -3,7 +3,7 @@ defmodule Idicon.Mixfile do
 
   def project do
     [app: :idicon,
-     version: "0.1.1",
+     version: "0.2.0",
      elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -39,9 +39,9 @@ defmodule Idicon.Mixfile do
 
   defp description do
     """
-    Idicon can be used to produce 5x5 user identifiable unique icons, also known as identicons.
+    Idicon can be used to produce 1x1 to 10x10 user identifiable unique icons, also known as identicons.
     These are similar to the default icons used with github.
-    Idicon supports 5x5 identicons in svg, png, or raw_bitmap, with custom padding.
+    Idicon supports identicons in svg, png, or raw_bitmap, with custom padding.
     """
   end
 

@@ -1,9 +1,10 @@
 defmodule Idicon do
 
   @moduledoc """
-  Idicon can be used to produce 5x5 user identifiable unique icons, also known as identicons.
+  Idicon can be used to produce 1x1 to 10x10 user identifiable unique icons, also known as identicons.
   These are similar to the default icons used with github.
-  Idicon supports 5x5 identicons in svg, png, or raw_bitmap, with custom padding.
+  Idicon supports identicons in svg, png, or raw_bitmap, with custom padding.
+  The default size is 5x5, but can be as large as 10x10 (but no larger).
 
   (String eg. User name) -> Idicon -> Image that is (mostly) unique to the user.
   Since the identicon can be produced repeatedly from the same input, it is not necessary
@@ -38,6 +39,8 @@ defmodule Idicon do
       red_png_icon_with_padding = Idicon.create("Elixir", type: :png, color: :red, padding: 5)
       large_turquoise_icon = Idicon.create("Elixir", [color: {64, 224, 208}, size: 1000])
       small_and_unique = Idicon.create("Elixir", %{color: :unique, size: 50})
+      ten_by_ten = Idicon.create("Elixir", %{squares: 10})
+      one_by_one = Idicon.create("Elixir", %{squares: 1})
 
       # Saving the Identicon using the helper function
       Idicon.create("Elixir")
@@ -50,13 +53,18 @@ defmodule Idicon do
   def create(input, opts \\ []) do
     %{type: type, color: color, padding: padding, size: size, squares: squares} = Enum.into(opts, @defaults)
     size = round(size)
-      input
+    cond do
+      squares > 10 -> raise ArgumentError, message: "Squares cannot be more than 10"
+      squares <= 0 -> raise ArgumentError, message: "Squares cannot be negative or zero"
+      :otherwise -> input
         |> hash_input
         |> determine_color(color)
         |> set_grid(squares)
         |> filter_odd_squares
         |> build_pixel_map(size, squares)
         |> draw_image(type, padding, size)
+    end
+
   end
   
   @doc """
@@ -120,7 +128,7 @@ defmodule Idicon do
     grid = 
       hex
         |> Enum.chunk(round(squares/2))
-        |> Enum.map(&mirror_row(&1,squares))
+        |> Enum.map(&mirror_row(&1,squares)) 
         |> List.flatten
         |> Enum.with_index
     
