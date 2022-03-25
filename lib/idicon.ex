@@ -127,7 +127,7 @@ defmodule Idicon do
   defp set_grid(%Idicon.Image{hex: hex} = image, squares) do
     grid = 
       hex
-        |> Enum.chunk(round(squares/2))
+        |> Enum.chunk_every(round(squares/2))
         |> Enum.map(&mirror_row(&1,squares)) 
         |> List.flatten
         |> Enum.with_index
